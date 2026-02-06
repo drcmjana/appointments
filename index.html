@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - Dr C M Jana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-weight: 500;
+        }
+
+        .time-slot:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .time-slot.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .time-slot.unavailable {
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message h3 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+
+            .time-slots {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Dr C M Jana</h1>
+            <p>Book Your Appointment Online</p>
+        </div>
+
+        <div class="form-container">
+            <div class="info-box">
+                <p><strong>⏰ Clinic Hours:</strong> Sunday - Tuesday: 10:00 AM - 1:00 PM | Thursday - Friday: 10:00 AM - 1:00 PM</p>
+                <p><strong>📍 Location:</strong> 48/28A/1B, South Sinthee Road, Kolkata-700050, West Bengal, India</p>
+            </div>
+
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="(123) 456-7890">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="visitType">Type of Visit <span class="required">*</span></label>
+                    <select id="visitType" name="visitType" required>
+                        <option value="">-- Select visit type --</option>
+                        <option value="general">General Consultation</option>
+                        <option value="followup">Follow-up Visit</option>
+                        <option value="specialist">Specialist Consultation</option>
+                        <option value="emergency">Emergency/Urgent Care</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Preferred Date <span class="required">*</span></label>
+                    <input type="date" id="date" name="date" required>
+                    <div class="error-message" id="dateError">Please contact Sneha Medicos for a visit on Wednesdays and Saturdays.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Time <span class="required">*</span></label>
+                    <div class="time-slots" id="timeSlots">
+                        <div class="time-slot" data-time="10:00">10:00 AM</div>
+                        <div class="time-slot" data-time="10:30">10:30 AM</div>
+                        <div class="time-slot" data-time="11:00">11:00 AM</div>
+                        <div class="time-slot" data-time="11:30">11:30 AM</div>
+                        <div class="time-slot" data-time="12:00">12:00 PM</div>
+                        <div class="time-slot" data-time="12:30">12:30 PM</div>
+                    </div>
+                    <input type="hidden" id="selectedTime" name="selectedTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reason">Reason for Visit</label>
+                    <textarea id="reason" name="reason" placeholder="Please briefly describe your concern (optional)"></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Book Appointment</button>
+            </form>
+
+            <div class="success-message" id="successMessage">
+                <h3>✅ Appointment Request Received!</h3>
+                <p><strong>Name:</strong> <span id="confirmName"></span></p>
+                <p><strong>Date:</strong> <span id="confirmDate"></span></p>
+                <p><strong>Time:</strong> <span id="confirmTime"></span></p>
+                <p><strong>Phone:</strong> <span id="confirmPhone"></span></p>
+                <br>
+                <p>We'll contact you shortly to confirm your appointment. Please check your phone for our call or message.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set minimum date to today
+        const dateInput = document.getElementById('date');
+        const dateError = document.getElementById('dateError');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+
+        // Validate that selected date is a clinic day (Sun, Mon, Tue, Thu, Fri)
+        dateInput.addEventListener('input', function() {
+            const selectedDate = new Date(this.value);
+            const dayOfWeek = selectedDate.getDay(); // 0=Sunday, 1=Monday, etc.
+            
+            // Clinic is CLOSED on Wednesday (3) and Saturday (6)
+            const closedDays = [3, 6]; // Wednesday and Saturday
+            
+            if (closedDays.includes(dayOfWeek)) {
+                dateError.classList.add('show');
+                this.value = '';
+            } else {
+                dateError.classList.remove('show');
+            }
+        });
+
+        // Handle time slot selection
+        const timeSlots = document.querySelectorAll('.time-slot');
+        const selectedTimeInput = document.getElementById('selectedTime');
+
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                if (this.classList.contains('unavailable')) return;
+                
+                // Remove selected class from all slots
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                
+                // Add selected class to clicked slot
+                this.classList.add('selected');
+                
+                // Set hidden input value
+                selectedTimeInput.value = this.dataset.time;
+            });
+        });
+
+        // Handle form submission
+        const form = document.getElementById('appointmentForm');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate time selection
+            if (!selectedTimeInput.value) {
+                alert('Please select a time slot');
+                return;
+            }
+
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                visitType: document.getElementById('visitType').value,
+                date: document.getElementById('date').value,
+                time: selectedTimeInput.value,
+                reason: document.getElementById('reason').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // In a real application, you would send this to a server
+            // For now, we'll store it in localStorage and show confirmation
+            
+            // Store in localStorage (you can later integrate with a backend)
+            let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            appointments.push(formData);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+
+            // Show success message
+            document.getElementById('confirmName').textContent = formData.name;
+            document.getElementById('confirmDate').textContent = new Date(formData.date).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('confirmTime').textContent = formatTime(formData.time);
+            document.getElementById('confirmPhone').textContent = formData.phone;
+
+            successMessage.classList.add('show');
+            form.style.display = 'none';
+
+            // Optional: Send email notification (requires backend)
+            // sendEmailNotification(formData);
+
+            // Optional: Send WhatsApp message (requires backend/API)
+            // sendWhatsAppNotification(formData);
+        });
+
+        function formatTime(time) {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : hour;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        // Optional: Mark some time slots as unavailable based on date
+        dateInput.addEventListener('change', function() {
+            // You can add logic here to check availability
+            // For now, all slots are available
+            // In a real app, you'd check against a database
+        });
+    </script>
+</body>
+</html>
