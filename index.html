@@ -372,10 +372,29 @@
             // In a real application, you would send this to a server
             // For now, we'll store it in localStorage and show confirmation
             
-            // Store in localStorage (you can later integrate with a backend)
-            let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-            appointments.push(formData);
-            localStorage.setItem('appointments', JSON.stringify(appointments));
+            // Store in localStorage
+let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+appointments.push(formData);
+localStorage.setItem('appointments', JSON.stringify(appointments));
+
+// Send to Google Sheets
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAT5iM3oYcj2VSKtB7Leat64IMWm_iP7c7edzHIMdQjnVvMbgGIxPYyHgcJ0pGDVca5A/exec';
+
+fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData)
+})
+.then(() => {
+    console.log('Appointment saved to Google Sheets!');
+})
+.catch((error) => {
+    console.error('Error saving to Google Sheets:', error);
+});
+
 
             // Show success message
             document.getElementById('confirmName').textContent = formData.name;
